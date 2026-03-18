@@ -13,13 +13,13 @@
     </head>
     <body>
         <header class="topbar">
-    <div class="title">Three.js Collision Demo</div>
-    <div class="controls">
-        🎮 MOUSE: mirar / lanzar bolas &nbsp;&nbsp; | &nbsp;&nbsp;
-        ⌨ WASD: mover &nbsp;&nbsp; | &nbsp;&nbsp;
-        ⬆ SPACE: saltar
-    </div>
-</header>
+            <div class="title">Three.js Collision Demo</div>
+            <div class="controls">
+                🎮 MOUSE: mirar / lanzar bolas &nbsp;&nbsp; | &nbsp;&nbsp;
+                ⌨ WASD: mover &nbsp;&nbsp; | &nbsp;&nbsp;
+                ⬆ SPACE: saltar
+            </div>
+        </header>
         <div id="container"></div>
 
         <script type="importmap">
@@ -41,7 +41,6 @@
             import { Capsule } from 'three/addons/math/Capsule.js';
             import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-            // SOLUCIÓN: Cambiamos Timer por Clock
             const clock = new THREE.Clock();
 
             const scene = new THREE.Scene();
@@ -87,9 +86,9 @@
             container.appendChild( stats.domElement );
 
             const GRAVITY = 30;
-            const NUM_SPHERES = 100;
+            const NUM_SPHERES = 15; // Optimizado
             const SPHERE_RADIUS = 0.2;
-            const STEPS_PER_FRAME = 5;
+            const STEPS_PER_FRAME = 2; // Optimizado
 
             const sphereGeometry = new THREE.IcosahedronGeometry( SPHERE_RADIUS, 5 );
             const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
@@ -296,7 +295,7 @@
 
                 gltf.scene.traverse( child => {
                     if ( child.isMesh ) {
-                        child.castShadow = true;
+                        child.castShadow = false; // Sombras apagadas para mejor rendimiento
                         child.receiveShadow = true;
                         if ( child.material.map ) child.material.map.anisotropy = 4;
                     }
@@ -312,18 +311,57 @@
                 } );
             } );
 
+            // ==========================================
+            // SISTEMA DE LÍMITES (4 PAREDES)
+            // ==========================================
+            
+            // Cuando termines de ajustarlas, cambia opacity a 0.0 para hacerlas invisibles
+            const wallGeometry = new THREE.BoxGeometry( 60, 20, 2 ); 
+            const wallMaterial = new THREE.MeshBasicMaterial( { 
+                color: 0xff0000, 
+                transparent: true, 
+                opacity: 0.5 
+            } );
+
+            // PARED 1 (Frente) - Cambia el '20' para alejarla o acercarla
+            const wall1 = new THREE.Mesh( wallGeometry, wallMaterial );
+            wall1.position.set( 0, 5, 20 ); 
+            scene.add( wall1 );
+            worldOctree.fromGraphNode( wall1 );
+
+            // PARED 2 (Atrás) - Cambia el '-20' para alejarla o acercarla
+            const wall2 = new THREE.Mesh( wallGeometry, wallMaterial );
+            wall2.position.set( 0, 5, -20 ); 
+            scene.add( wall2 );
+            worldOctree.fromGraphNode( wall2 );
+
+            // PARED 3 (Izquierda) - Cambia el '-20' para alejarla o acercarla
+            const wall3 = new THREE.Mesh( wallGeometry, wallMaterial );
+            wall3.position.set( -20, 5, 0 );
+            wall3.rotation.y = Math.PI / 2; // Gira la pared de lado
+            scene.add( wall3 );
+            worldOctree.fromGraphNode( wall3 );
+
+            // PARED 4 (Derecha) - Cambia el '20' para alejarla o acercarla
+            const wall4 = new THREE.Mesh( wallGeometry, wallMaterial );
+            wall4.position.set( 20, 5, 0 );
+            wall4.rotation.y = Math.PI / 2; 
+            scene.add( wall4 );
+            worldOctree.fromGraphNode( wall4 );
+
+            // ==========================================
+
             function teleportPlayerIfOob() {
-    if ( camera.position.y <= - 25 ) {
-        playerCollider.start.set( 0, 10, 0 ); // Aquí cambiamos a 10
-        playerCollider.end.set( 0, 11, 0 );   // Aquí cambiamos a 11
-        playerCollider.radius = 0.35;
-        camera.position.copy( playerCollider.end );
-        camera.rotation.set( 0, 0, 0 );
-    }
-}
+                if ( camera.position.y <= - 25 ) {
+                    playerCollider.start.set( 0, 10, 0 );
+                    playerCollider.end.set( 0, 11, 0 );
+                    playerCollider.radius = 0.35;
+                    camera.position.copy( playerCollider.end );
+                    camera.rotation.set( 0, 0, 0 );
+                }
+            }
 
             function animate() {
-                // SOLUCIÓN: Calculamos el delta con el clock
                 const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
 
                 for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
@@ -339,8 +377,8 @@
 
         </script>
 
-		<footer class="footer">
-    Proyecto Three.js | Interacción 3D | Denise Campos
-</footer>
+        <footer class="footer">
+            Proyecto Three.js | Interacción 3D | Denise Campos
+        </footer>
     </body>
 </html>
