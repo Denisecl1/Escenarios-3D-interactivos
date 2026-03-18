@@ -86,9 +86,9 @@
             container.appendChild( stats.domElement );
 
             const GRAVITY = 30;
-            const NUM_SPHERES = 15; // Optimizado
+            const NUM_SPHERES = 15; 
             const SPHERE_RADIUS = 0.2;
-            const STEPS_PER_FRAME = 2; // Optimizado
+            const STEPS_PER_FRAME = 2; 
 
             const sphereGeometry = new THREE.IcosahedronGeometry( SPHERE_RADIUS, 5 );
             const sphereMaterial = new THREE.MeshLambertMaterial( { color: 0xdede8d } );
@@ -295,7 +295,7 @@
 
                 gltf.scene.traverse( child => {
                     if ( child.isMesh ) {
-                        child.castShadow = false; // Sombras apagadas para mejor rendimiento
+                        child.castShadow = false; 
                         child.receiveShadow = true;
                         if ( child.material.map ) child.material.map.anisotropy = 4;
                     }
@@ -312,39 +312,39 @@
             } );
 
             // ==========================================
-            // SISTEMA DE LÍMITES (4 PAREDES)
+            // SISTEMA DE LÍMITES (4 PAREDES MÁS CERRADAS)
             // ==========================================
             
-            // Cuando termines de ajustarlas, cambia opacity a 0.0 para hacerlas invisibles
             const wallGeometry = new THREE.BoxGeometry( 60, 20, 2 ); 
             const wallMaterial = new THREE.MeshBasicMaterial( { 
                 color: 0xff0000, 
                 transparent: true, 
+                // AHORA ESTÁ EN 0.5. CUANDO ENCAJEN PERFECTO, CÁMBIALO A 0.0
                 opacity: 0.5 
             } );
 
-            // PARED 1 (Frente) - Cambia el '20' para alejarla o acercarla
+            // PARED 1 (Frente) - Acercada a 12
             const wall1 = new THREE.Mesh( wallGeometry, wallMaterial );
-            wall1.position.set( 0, 5, 20 ); 
+            wall1.position.set( 0, 5, 10.90 ); 
             scene.add( wall1 );
             worldOctree.fromGraphNode( wall1 );
 
-            // PARED 2 (Atrás) - Cambia el '-20' para alejarla o acercarla
+            // PARED 2 (Atrás) - Acercada a -12
             const wall2 = new THREE.Mesh( wallGeometry, wallMaterial );
-            wall2.position.set( 0, 5, -20 ); 
+            wall2.position.set( 0, 5, -10.90 ); 
             scene.add( wall2 );
             worldOctree.fromGraphNode( wall2 );
 
-            // PARED 3 (Izquierda) - Cambia el '-20' para alejarla o acercarla
+            // PARED 3 (Izquierda) - Acercada a -12
             const wall3 = new THREE.Mesh( wallGeometry, wallMaterial );
-            wall3.position.set( -20, 5, 0 );
-            wall3.rotation.y = Math.PI / 2; // Gira la pared de lado
+            wall3.position.set( -10.90, 5, 0 );
+            wall3.rotation.y = Math.PI / 2; 
             scene.add( wall3 );
             worldOctree.fromGraphNode( wall3 );
 
-            // PARED 4 (Derecha) - Cambia el '20' para alejarla o acercarla
+            // PARED 4 (Derecha) - Acercada a 12
             const wall4 = new THREE.Mesh( wallGeometry, wallMaterial );
-            wall4.position.set( 20, 5, 0 );
+            wall4.position.set( 10.90, 5, 0 );
             wall4.rotation.y = Math.PI / 2; 
             scene.add( wall4 );
             worldOctree.fromGraphNode( wall4 );
